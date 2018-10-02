@@ -1,0 +1,125 @@
+---
+title: "homework1_xw2598"
+author: "Xinyao WU"
+date: "2018/9/18"
+output:
+    md_document:
+    toc: true
+    toc_float: true
+---
+# *problem 1* 
+##code chunk 1
+  Generate a data_frame included:
+  
+  10 uniform random variables with values b/w 0 and 5 
+  
+  A logical vector indicating whether elements of random_sample are greater than 2 
+  
+  A (length-10) character vector 
+  
+  A (length-10) factor vector
+```{r chunk1}
+
+library(tidyverse)
+dt_frame = tibble(
+  random_sample = runif(10, min = 0, max = 5) ,
+  logical_vector = random_sample > 2 ,
+  ch_vector = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j") ,
+  factor_vector = as.factor(ch_vector) 
+)
+dt_frame = as.data.frame(dt_frame)
+
+# view top lines of dt_frame
+head(dt_frame)
+
+```
+
+##The mean of each variable in the dataframe
+
+The mean of **random sample** is `r mean(dt_frame$random_sample)`
+
+The mean of the **logical vector** is `r mean(dt_frame$logical_vector)`
+
+The mean of the **character vector** is `r mean(dt_frame$ch_vector)`
+
+The mean of the **list of factor vector** is `r mean(dt_frame$factor_vector)`
+
+**Explanation:**When applying the function of mean(),the random sample and logical vector worked while character vector and factor vector didn`t work. That is because according to the useage of mean(), the elements of the vector should be umeric/logical vectors and date, date-time and time interval objects.
+
+## code chunk 2 
+
+```{r chunk2, results='hide',warning=FALSE}
+#change character to numeric
+chr_to_num = as.numeric(dt_frame$ch_vector) 
+#change character to factor
+chr_to_factor = as.factor(dt_frame$ch_vector) 
+#change factor to character
+factor_to_chr = as.character(dt_frame$factor_vector) 
+#change factor to numeric
+factor_to_num = as.numeric(dt_frame$factor_vector) 
+#change logical to numeric
+logic_to_num = as.numeric(dt_frame$logical_vector) 
+
+```
+**Explanation**The warning (not shown above) means the variables cannot be converted from character to numberic. Except that, some other kinds of conversions(exp:factor to numberic to character,logic to numberic, character to factor ) can be realized successfully.
+
+
+# *problem 2 *
+##code chunk 3
+  Create a data_frame included:
+  
+  Respectivgely generate x,y: a random sample of size 1000 from a standard Normal distribution.
+  
+  A logical vector indicating whether the x + y > 0.
+  
+  A numeric vector created by coercing the above logical vector.
+  
+  A factor vector created by coercing the above logical vector.
+
+```{r chunk3}
+  
+dt_frame2 = tibble(
+  x = rnorm(1000, mean = 0, sd = 1) , 
+  y = rnorm(1000, mean = 0, sd = 1) ,
+  vc_logic = x + y > 0 ,
+  vc_num = as.numeric(vc_logic) ,
+  vc_factor = as.factor(vc_logic)
+)
+dt_frame2 = as.data.frame(dt_frame2)
+
+head(dt_frame2)
+
+```
+The size of the dataset is `r nrow(dt_frame2)` rows* `r ncol(dt_frame2)` columns  .
+
+The mean of x is `r mean(dt_frame2$x)` and the median of x is `r median(dt_frame2$x)` .
+
+The proportion of cases for which the logical vector is TRUE is `r  round(sum(dt_frame2$vc_num)/1000,3)`.
+
+##scatterplot
+
+```{r}
+#Create scarrerplot of y vs x and the point colored by logical variable
+ggplot(dt_frame2, mapping = aes(x, y))+
+  geom_point(data = dt_frame2, aes(x, y), 
+             col = ifelse(dt_frame2$vc_logic, "red", "blue"), 
+             size =1 ) +
+  labs(title = "scatterplot of y vs x ")
+ggsave("scatterplot_of_x_vs_y_colored_logic.pdf")
+
+#Create scarrerplot of y vs x and the point colored by numberic variable
+ggplot(dt_frame2, mapping = aes(x, y))+
+  geom_point(data = dt_frame2, aes(x, y), 
+             col = ifelse(dt_frame2$vc_num, "blue", "green"), 
+             size =1 ) +
+  labs(title = "scatterplot of y vs x ")
+
+#Create scarrerplot of y vs x and the point colored by factor variable
+ggplot(dt_frame2, mapping = aes(x, y))+
+  geom_point(data = dt_frame2, aes(x, y),
+             col = ifelse(dt_frame2$vc_factor == "TRUE", "purple", "violet"), 
+             size =1 ) +
+  labs(title = "scatterplot of y vs x ")
+
+```
+
